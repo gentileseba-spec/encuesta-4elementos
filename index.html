@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Encuesta Talleres — Colegio 4 Elementos</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; background: #F7F7F5; min-height: 100vh; padding: 24px 16px; }
+.wrap { max-width: 580px; margin: 0 auto; }
+
+.header { background: #085041; border-radius: 12px; padding: 22px 24px; margin-bottom: 18px; }
+.header h1 { color: white; font-size: 17px; font-weight: 700; margin-bottom: 5px; }
+.header p { color: #9FE1CB; font-size: 12px; line-height: 1.5; }
+.aviso { background: rgba(255,255,255,0.12); border-radius: 8px; padding: 9px 13px; margin-top: 12px; font-size: 11px; color: #D0F0E6; line-height: 1.5; }
+
+.progress-bar { height: 5px; background: #E0E0E0; border-radius: 3px; margin-bottom: 6px; }
+.progress-fill { height: 5px; background: #1D9E75; border-radius: 3px; transition: width 0.35s ease; }
+.progress-label { font-size: 11px; color: #999; text-align: right; margin-bottom: 14px; }
+
+.card { background: white; border: 1px solid #EBEBEB; border-radius: 12px; padding: 20px 22px; margin-bottom: 12px; }
+.card.hidden { display: none; }
+
+.section-tag { display: inline-block; font-size: 10px; font-weight: 700; padding: 3px 9px; border-radius: 10px; margin-bottom: 12px; text-transform: uppercase; letter-spacing: 0.07em; }
+.q-label { font-size: 14px; font-weight: 600; color: #111; margin-bottom: 5px; line-height: 1.4; }
+.q-sub { font-size: 12px; color: #888; margin-bottom: 12px; }
+
+select { width: 100%; padding: 11px 14px; font-size: 13px; border: 1.5px solid #DDD; border-radius: 8px; background: white; color: #111; cursor: pointer; -webkit-appearance: none; appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 12px center; }
+select:focus { outline: none; border-color: #085041; }
+
+.nps-wrap { display: flex; gap: 5px; flex-wrap: wrap; margin-bottom: 6px; }
+.nps-btn { width: 46px; height: 38px; border-radius: 7px; border: 1.5px solid #DDD; background: white; font-size: 13px; font-weight: 500; cursor: pointer; color: #555; transition: all 0.12s; }
+.nps-btn:hover { border-color: #085041; color: #085041; }
+.nps-btn.sel { background: #085041; border-color: #085041; color: white; }
+.nps-labels { display: flex; justify-content: space-between; font-size: 10px; color: #BBB; }
+
+.options { display: flex; flex-direction: column; gap: 8px; }
+.opt { display: flex; align-items: center; gap: 10px; padding: 10px 13px; border: 1.5px solid #EBEBEB; border-radius: 9px; cursor: pointer; font-size: 13px; color: #111; transition: border-color 0.12s; }
+.opt:hover { border-color: #085041; }
+.opt.sel { border-color: #085041; background: #E8F7F1; }
+.opt input { accent-color: #085041; width: 15px; height: 15px; flex-shrink: 0; cursor: pointer; }
+
+.taller-block { border-left: 3px solid; padding-left: 14px; margin-bottom: 20px; padding-bottom: 4px; }
+.taller-name { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 12px; }
+.eval-row { margin-bottom: 10px; }
+.eval-label { font-size: 12px; color: #555; font-weight: 500; margin-bottom: 5px; }
+.stars { display: flex; gap: 5px; }
+.star { font-size: 28px; cursor: pointer; color: #DDD; transition: color 0.1s; line-height: 1; -webkit-user-select: none; user-select: none; }
+.star.on { color: #F0A500; }
+.star-lbl { font-size: 11px; color: #888; min-height: 16px; margin-top: 2px; }
+
+textarea { width: 100%; padding: 11px 13px; font-size: 13px; border: 1.5px solid #DDD; border-radius: 9px; resize: vertical; min-height: 80px; font-family: inherit; color: #111; line-height: 1.5; }
+textarea:focus { outline: none; border-color: #085041; }
+
+.btn { width: 100%; padding: 12px; background: #085041; color: white; border: none; border-radius: 9px; font-size: 14px; font-weight: 600; cursor: pointer; margin-top: 14px; transition: background 0.15s; }
+.btn:hover { background: #0F6E56; }
+.btn:disabled { background: #CCC; cursor: default; }
+.btn.verde { background: #1D9E75; }
+.btn.verde:hover { background: #17875F; }
+.btn.sending { background: #888; cursor: default; }
+
+.gracias { text-align: center; padding: 40px 20px; }
+.gracias .icon { font-size: 52px; margin-bottom: 14px; }
+.gracias h2 { color: #085041; font-size: 20px; margin-bottom: 8px; }
+.gracias p { color: #666; font-size: 14px; line-height: 1.6; }
+
+.error-msg { background: #FCEBEB; border-radius: 8px; padding: 10px 14px; font-size: 12px; color: #791F1F; margin-top: 10px; display: none; }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="header">
+    <h1>🌿 Encuesta de talleres — Colegio 4 Elementos</h1>
+    <p>Queremos mejorar nuestra propuesta de talleres para 2026. Tu opinión es fundamental para lograrlo.</p>
+    <div class="aviso">🔒 Esta encuesta es anónima. Los resultados son de uso interno exclusivo del equipo directivo y no serán compartidos.</div>
+  </div>
+
+  <div class="progress-bar"><div class="progress-fill" id="prog" style="width:4%"></div></div>
+  <div class="progress-label" id="prog-label">Paso 1 de 6</div>
+
+  <!-- PASO 0: NIVEL -->
+  <div class="card" id="paso-0">
+    <div class="q-label">¿A qué sala o grado asiste tu hijo/a?</div>
+    <div class="q-sub">Esto nos permite mostrarte las preguntas correspondientes a su nivel.</div>
+    <select id="nivel-sel" onchange="setNivel(this.value)">
+      <option value="">— Seleccioná un nivel —</option>
+      <option value="casa">Casa de Niños (3 a 5 años)</option>
+      <option value="t1">Taller 1 — 1er grado (6 años)</option>
+      <option value="t2">Taller 2 — 2do y 3er grado (7-8 años)</option>
+      <option value="t3">Taller 3 — 4to a 7mo grado</option>
+    </select>
+    <button class="btn" id="btn-0" onclick="goStep(1)" disabled>Continuar →</button>
+  </div>
+
+  <!-- PASO 1: NPS -->
+  <div class="card hidden" id="paso-1">
+    <span class="section-tag" style="background:#E1F5EE;color:#085041">Percepción general</span>
+    <div class="q-label">Del 1 al 10, ¿cuánto recomendarías los talleres de la tarde a otra familia?</div>
+    <div class="q-sub">1 = no los recomendaría · 10 = los recomendaría con total convicción</div>
+    <div class="nps-wrap" id="nps-wrap"></div>
+    <div class="nps-labels"><span>No los recomendaría</span><span>Los recomendaría mucho</span></div>
+    <button class="btn" id="btn-1" onclick="goStep(2)" disabled style="margin-top:16px">Continuar →</button>
+  </div>
+
+  <!-- PASO 2: DISFRUTE -->
+  <div class="card hidden" id="paso-2">
+    <span class="section-tag" style="background:#E1F5EE;color:#085041">Percepción general</span>
+    <div class="q-label">En general, ¿tu hijo/a disfruta los talleres de la tarde?</div>
+    <div class="options" id="opts-disfrute">
+      <label class="opt"><input type="radio" name="disfrute" onchange="selOpt(this,'opts-disfrute');enableBtn('btn-2')"> Sí, los disfruta mucho</label>
+      <label class="opt"><input type="radio" name="disfrute" onchange="selOpt(this,'opts-disfrute');enableBtn('btn-2')"> Los disfruta, aunque algunos más que otros</label>
+      <label class="opt"><input type="radio" name="disfrute" onchange="selOpt(this,'opts-disfrute');enableBtn('btn-2')"> Los tolera pero no los disfruta especialmente</label>
+      <label class="opt"><input type="radio" name="disfrute" onchange="selOpt(this,'opts-disfrute');enableBtn('btn-2')"> No los disfruta</label>
+    </div>
+    <button class="btn" id="btn-2" onclick="goStep(3)" disabled>Continuar →</button>
+  </div>
+
+  <!-- PASO 3: EVALUACIÓN POR TALLER -->
+  <div class="card hidden" id="paso-3">
+    <span class="section-tag" style="background:#EEEDFE;color:#3C3489">Talleres específicos</span>
+    <div class="q-label">Evaluá cada taller de tu hijo/a</div>
+    <div class="q-sub">Calificá del 1★ al 5★★★★★ el contenido y la docente por separado.</div>
+    <div id="talleres-container"></div>
+    <button class="btn" id="btn-3" onclick="goStep(4)">Continuar →</button>
+  </div>
+
+  <!-- PASO 4: MEJOR / PEOR -->
+  <div class="card hidden" id="paso-4">
+    <span class="section-tag" style="background:#EEEDFE;color:#3C3489">Talleres específicos</span>
+    <div class="q-label">¿Cuál es el taller que más valora o disfruta tu hijo/a?</div>
+    <div id="opts-mejor" class="options" style="margin-bottom:20px"></div>
+    <div class="q-label">¿Cuál es el taller que menos disfruta o que menos le aporta?</div>
+    <div id="opts-peor" class="options"></div>
+    <button class="btn" id="btn-4" onclick="goStep(5)">Continuar →</button>
+  </div>
+
+  <!-- PASO 5: PROPUESTA 2026 -->
+  <div class="card hidden" id="paso-5">
+    <span class="section-tag" style="background:#FAEEDA;color:#633806">Propuesta 2026</span>
+    <div class="q-label">¿Hay alguna actividad o taller que te gustaría que el colegio incorpore?</div>
+    <div class="q-sub">Podés mencionar más de uno — cualquier idea es bienvenida.</div>
+    <textarea id="nuevo-taller" placeholder="Ej: natación, teatro, cocina, programación avanzada..."></textarea>
+
+    <div class="q-label" style="margin-top:20px">¿Cómo preferirías que fuera la propuesta de talleres?</div>
+    <div class="options" id="opts-flex" style="margin-bottom:14px">
+      <label class="opt"><input type="radio" name="flex" value="todos" onchange="selOpt(this,'opts-flex');toggleCuales(false)"> Que asista a todos los talleres disponibles para su nivel</label>
+      <label class="opt"><input type="radio" name="flex" value="elegir" onchange="selOpt(this,'opts-flex');toggleCuales(true)"> Que pueda elegir a cuáles talleres asistir</label>
+      <label class="opt"><input type="radio" name="flex" value="indiferente" onchange="selOpt(this,'opts-flex');toggleCuales(false)"> Me es indiferente, lo que el colegio proponga</label>
+    </div>
+    <div id="bloque-cuales" style="display:none">
+      <div class="q-label">Si pudieras elegir, ¿a cuáles inscribirías a tu hijo/a?</div>
+      <div class="q-sub">Podés marcar más de uno.</div>
+      <div id="opts-cuales" class="options" style="margin-bottom:6px"></div>
+    </div>
+    <button class="btn" onclick="goStep(6)">Continuar →</button>
+  </div>
+
+  <!-- PASO 6: COMENTARIO LIBRE -->
+  <div class="card hidden" id="paso-6">
+    <span class="section-tag" style="background:#F1EFE8;color:#444">Para cerrar</span>
+    <div class="q-label">¿Querés agregar algún comentario sobre los talleres o la propuesta de tarde?</div>
+    <div class="q-sub">Opcional — cualquier cosa que nos ayude a mejorar.</div>
+    <textarea id="comentario" placeholder="Tu comentario acá..."></textarea>
+    <div class="error-msg" id="error-msg">Hubo un problema al enviar. Por favor intentá de nuevo.</div>
+    <button class="btn verde" id="btn-enviar" onclick="enviar()">Enviar respuestas ✓</button>
+  </div>
+
+  <!-- GRACIAS -->
+  <div class="card hidden" id="paso-gracias">
+    <div class="gracias">
+      <div class="icon">🌿</div>
+      <h2>¡Muchas gracias!</h2>
+      <p>Tu respuesta nos ayuda a diseñar una propuesta de talleres que realmente valga la pena para los chicos.<br><br>Con cariño, el equipo del Colegio 4 Elementos.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbxBzpez4wb4jfbYcJeqsnEr-KXEOlNBN6_ifPNfmVHqP6mxButoKl1V4sWMCldZ95V3/exec";
+
+const TALLERES = {
+  casa: ["Inglés", "Taller con Seño"],
+  t1:   ["Inglés", "Robótica e Informática", "Arte", "Tejido"],
+  t2:   ["Robótica e Informática", "Inglés", "Tejido", "Expresión Corporal"],
+  t3:   ["Inglés", "Robótica e Informática", "Arte"],
+};
+
+const COLORES = [
+  { fg: "#3C3489", border: "#AFA9EC" },
+  { fg: "#0C447C", border: "#85B7EB" },
+  { fg: "#633806", border: "#EF9F27" },
+  { fg: "#085041", border: "#5DCAA5" },
+  { fg: "#993C1D", border: "#E8876A" },
+];
+
+const NIVEL_LABELS = {
+  casa: "Casa de Niños", t1: "Taller 1", t2: "Taller 2", t3: "Taller 3"
+};
+
+const STAR_LABELS = ["","Muy bajo","Bajo","Aceptable","Bueno","Excelente"];
+const STEPS = 6;
+
+let nivel = "", step = 0, ratings = {}, npsVal = null;
+
+function setNivel(v) {
+  nivel = v;
+  document.getElementById("btn-0").disabled = !v;
+}
+
+function goStep(n) {
+  document.getElementById(step === 0 ? "paso-0" : "paso-" + step).classList.add("hidden");
+  if (n === 1) buildNPS();
+  if (n === 3) buildTalleres();
+  if (n === 4) buildMejorPeor();
+  if (n === 5) buildCuales();
+  step = n;
+  document.getElementById("paso-" + n).classList.remove("hidden");
+  document.getElementById("prog").style.width = Math.round((n / STEPS) * 100) + "%";
+  document.getElementById("prog-label").textContent = n < STEPS ? "Paso " + n + " de " + STEPS : "Último paso";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function buildNPS() {
+  const wrap = document.getElementById("nps-wrap");
+  wrap.innerHTML = "";
+  for (let i = 1; i <= 10; i++) {
+    const b = document.createElement("button");
+    b.className = "nps-btn"; b.textContent = i;
+    b.onclick = () => {
+      npsVal = i;
+      document.querySelectorAll(".nps-btn").forEach(x => x.classList.remove("sel"));
+      b.classList.add("sel");
+      document.getElementById("btn-1").disabled = false;
+    };
+    wrap.appendChild(b);
+  }
+}
+
+function buildTalleres() {
+  const talleres = TALLERES[nivel] || [];
+  const c = document.getElementById("talleres-container");
+  c.innerHTML = "";
+  talleres.forEach((t, i) => {
+    const col = COLORES[i % COLORES.length];
+    const div = document.createElement("div");
+    div.className = "taller-block";
+    div.style.borderColor = col.border;
+    div.innerHTML = `
+      <div class="taller-name" style="color:${col.fg}">${t}</div>
+      <div class="eval-row">
+        <div class="eval-label">Contenido del taller</div>
+        <div class="stars" id="sc-${i}"></div>
+        <div class="star-lbl" id="sl-sc-${i}"></div>
+      </div>
+      <div class="eval-row">
+        <div class="eval-label">Docente — motivación, manejo del grupo, calidad</div>
+        <div class="stars" id="sd-${i}"></div>
+        <div class="star-lbl" id="sl-sd-${i}"></div>
+      </div>`;
+    c.appendChild(div);
+    buildStars("sc-" + i, "sl-sc-" + i, "cont-" + i);
+    buildStars("sd-" + i, "sl-sd-" + i, "doc-" + i);
+  });
+}
+
+function buildStars(wrId, lblId, key) {
+  const wr = document.getElementById(wrId);
+  const lbl = document.getElementById(lblId);
+  for (let s = 1; s <= 5; s++) {
+    const sp = document.createElement("span");
+    sp.className = "star"; sp.textContent = "★";
+    sp.onclick = () => {
+      ratings[key] = s;
+      wr.querySelectorAll(".star").forEach((x, xi) => x.classList.toggle("on", xi < s));
+      lbl.textContent = STAR_LABELS[s];
+    };
+    sp.onmouseover = () => wr.querySelectorAll(".star").forEach((x, xi) => x.classList.toggle("on", xi < s));
+    sp.onmouseout  = () => wr.querySelectorAll(".star").forEach((x, xi) => x.classList.toggle("on", xi < (ratings[key]||0)));
+    wr.appendChild(sp);
+  }
+}
+
+function buildMejorPeor() {
+  const talleres = TALLERES[nivel] || [];
+  ["mejor","peor"].forEach(tipo => {
+    const wrap = document.getElementById("opts-" + tipo);
+    wrap.innerHTML = "";
+    talleres.forEach(t => {
+      const lbl = document.createElement("label");
+      lbl.className = "opt";
+      lbl.innerHTML = `<input type="radio" name="${tipo}"> ${t}`;
+      lbl.querySelector("input").onchange = () => selOpt(lbl.querySelector("input"), "opts-" + tipo);
+      wrap.appendChild(lbl);
+    });
+    const n = document.createElement("label");
+    n.className = "opt";
+    n.innerHTML = `<input type="radio" name="${tipo}"> Ninguno en particular`;
+    n.querySelector("input").onchange = () => selOpt(n.querySelector("input"), "opts-" + tipo);
+    wrap.appendChild(n);
+  });
+}
+
+function buildCuales() {
+  const talleres = TALLERES[nivel] || [];
+  const wrap = document.getElementById("opts-cuales");
+  wrap.innerHTML = "";
+  talleres.forEach(t => {
+    const lbl = document.createElement("label");
+    lbl.className = "opt";
+    lbl.innerHTML = `<input type="checkbox"> ${t}`;
+    wrap.appendChild(lbl);
+  });
+}
+
+function toggleCuales(show) {
+  document.getElementById("bloque-cuales").style.display = show ? "block" : "none";
+}
+
+function selOpt(input, cid) {
+  document.querySelectorAll("#" + cid + " .opt").forEach(o => o.classList.remove("sel"));
+  input.closest(".opt").classList.add("sel");
+}
+
+function enableBtn(id) { document.getElementById(id).disabled = false; }
+
+function getRadioVal(name) {
+  const el = document.querySelector("input[name='" + name + "']:checked");
+  return el ? el.closest(".opt").textContent.trim() : "";
+}
+
+function enviar() {
+  const btn = document.getElementById("btn-enviar");
+  btn.textContent = "Enviando...";
+  btn.classList.add("sending");
+  btn.disabled = true;
+  document.getElementById("error-msg").style.display = "none";
+
+  const talleres = TALLERES[nivel] || [];
+
+  // Cuales eligiría
+  const cualesChecked = [];
+  document.querySelectorAll("#opts-cuales input[type=checkbox]:checked").forEach(cb => {
+    cualesChecked.push(cb.closest(".opt").textContent.trim());
+  });
+
+  const payload = {
+    nivel: NIVEL_LABELS[nivel] || nivel,
+    nps: npsVal,
+    disfrute: getRadioVal("disfrute"),
+    cont0: ratings["cont-0"] || "",
+    doc0:  ratings["doc-0"]  || "",
+    cont1: ratings["cont-1"] || "",
+    doc1:  ratings["doc-1"]  || "",
+    cont2: ratings["cont-2"] || "",
+    doc2:  ratings["doc-2"]  || "",
+    cont3: ratings["cont-3"] || "",
+    doc3:  ratings["doc-3"]  || "",
+    mejor: getRadioVal("mejor"),
+    peor:  getRadioVal("peor"),
+    nuevoTaller: document.getElementById("nuevo-taller").value.trim(),
+    flex:  getRadioVal("flex"),
+    cuales: cualesChecked.join(", "),
+    comentario: document.getElementById("comentario").value.trim(),
+  };
+
+  // Nombres de talleres para contexto en el sheet
+  talleres.forEach((t, i) => {
+    payload["taller_" + i] = t;
+  });
+
+  fetch(SCRIPT_URL, {
+    method: "POST",
+    mode: "no-cors",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload)
+  })
+  .then(() => {
+    document.getElementById("paso-6").classList.add("hidden");
+    document.getElementById("paso-gracias").classList.remove("hidden");
+    document.getElementById("prog").style.width = "100%";
+    document.getElementById("prog-label").textContent = "Completado ✓";
+  })
+  .catch(() => {
+    btn.textContent = "Enviar respuestas ✓";
+    btn.classList.remove("sending");
+    btn.disabled = false;
+    document.getElementById("error-msg").style.display = "block";
+  });
+}
+</script>
+</body>
+</html>
