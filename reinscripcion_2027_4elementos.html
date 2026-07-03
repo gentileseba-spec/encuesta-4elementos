@@ -149,7 +149,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
   <div class="info-box" style="margin-bottom:16px">Por favor completá <strong>todos los campos</strong> de al menos uno de los dos tutores. Si ambos están presentes en el hogar, completá los dos.</div>
 
   <div class="section-title">Padre / Tutor</div>
-  <div class="field req"><label>Nombre y apellido</label><input type="text" id="p-nombre" placeholder="Nombre completo"></div>
+  <div class="field req"><label>Nombre y apellido</label><input type="text" id="p-nombre" placeholder="Nombre completo" oninput="clearError(this)"></div>
   <div class="row2">
     <div class="field req"><label>DNI</label><input type="text" id="p-dni" placeholder="Sin puntos"></div>
     <div class="field req"><label>Fecha de nacimiento</label><input type="date" id="p-fnac"></div>
@@ -245,6 +245,19 @@ const LOGO_B64 = "/9j/4AAQSkZJRgABAQAAAQABAAD/4gHYSUNDX1BST0ZJTEUAAQEAAAHIAAAAAA
 let step=1, ambiente='', reinscribe='', formData={};
 let stepHistory=[];
 
+function clearError(el){
+  el.style.borderColor='';
+  // Reset info box if all errors cleared
+  const campos=['p-nombre','p-dni','p-fnac','p-dom','p-tel','p-ecivil','p-email','p-prof','m-nombre','m-dni','m-fnac','m-dom','m-tel','m-ecivil','m-email','m-prof'];
+  const anyRed=campos.some(id=>{const e=document.getElementById(id);return e&&e.style.borderColor==='#C0392B';});
+  if(!anyRed){
+    const infoBox=document.querySelector('#paso-4 .info-box');
+    if(infoBox){
+      infoBox.style.background='';infoBox.style.color='';
+      infoBox.innerHTML='Por favor completá <strong>todos los campos</strong> de al menos uno de los dos tutores. Si ambos están presentes en el hogar, completá los dos.';
+    }
+  }
+}
 function goBack(){
   if(stepHistory.length===0) return;
   // Hide current
@@ -541,7 +554,36 @@ function enviar(){
   const madreCompleta = d.m_nombre && d.m_dni && d.m_fnac && d.m_dom && d.m_tel && d.m_ecivil && d.m_email && d.m_prof;
 
   if(!padreCompleto && !madreCompleta){
-    alert('Por favor completá todos los campos de al menos un padre o tutor (padre/tutor o madre/tutora).');return;
+    // Volver al paso 4 para que pueda corregir
+    document.getElementById('paso-5').classList.add('hidden');
+    step = 4;
+    stepHistory.push(5);
+    document.getElementById('paso-4').classList.remove('hidden');
+    document.getElementById('prog').style.width = '80%';
+    document.getElementById('prog-label').textContent = 'Paso 4 de 5';
+    window.scrollTo({top:0,behavior:'smooth'});
+    // Highlight missing fields
+    setTimeout(()=>{
+      const camposPadre = ['p-nombre','p-dni','p-fnac','p-dom','p-tel','p-ecivil','p-email','p-prof'];
+      const camposMadre = ['m-nombre','m-dni','m-fnac','m-dom','m-tel','m-ecivil','m-email','m-prof'];
+      const todosPadre = camposPadre.every(id=>document.getElementById(id)?.value?.trim());
+      const todosMadre = camposMadre.every(id=>document.getElementById(id)?.value?.trim());
+      if(!todosPadre && !todosMadre){
+        // Marcar campos vacíos en rojo
+        [...camposPadre,...camposMadre].forEach(id=>{
+          const el=document.getElementById(id);
+          if(el && !el.value.trim()) el.style.borderColor='#C0392B';
+        });
+        // Mostrar mensaje arriba del bloque
+        const infoBox = document.querySelector('#paso-4 .info-box');
+        if(infoBox){
+          infoBox.style.background='#FCEBEB';
+          infoBox.style.color='#791F1F';
+          infoBox.innerHTML='⚠️ <strong>Campos incompletos.</strong> Por favor completá todos los campos marcados en rojo de al menos un padre o tutor.';
+        }
+      }
+    }, 100);
+    return;
   }
 
   formData=d;
