@@ -146,17 +146,18 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
 <!-- PASO 4: DATOS PADRES -->
 <div class="card hidden" id="paso-4">
   <span class="section-tag" style="background:#E6F1FB;color:#0C447C">Datos de los padres / tutores</span>
+  <div class="info-box" style="margin-bottom:16px">Por favor completá <strong>todos los campos</strong> de al menos uno de los dos tutores. Si ambos están presentes en el hogar, completá los dos.</div>
 
   <div class="section-title">Padre / Tutor</div>
   <div class="field req"><label>Nombre y apellido</label><input type="text" id="p-nombre" placeholder="Nombre completo"></div>
   <div class="row2">
     <div class="field req"><label>DNI</label><input type="text" id="p-dni" placeholder="Sin puntos"></div>
-    <div class="field"><label>Fecha de nacimiento</label><input type="date" id="p-fnac"></div>
+    <div class="field req"><label>Fecha de nacimiento</label><input type="date" id="p-fnac"></div>
   </div>
-  <div class="field"><label>Domicilio</label><input type="text" id="p-dom" placeholder="Calle, número, localidad"></div>
+  <div class="field req"><label>Domicilio</label><input type="text" id="p-dom" placeholder="Calle, número, localidad"></div>
   <div class="row2">
     <div class="field req"><label>Teléfono</label><input type="tel" id="p-tel" placeholder="Número de contacto"></div>
-    <div class="field"><label>Estado civil</label>
+    <div class="field req"><label>Estado civil</label>
       <select id="p-ecivil">
         <option value="">Seleccioná</option>
         <option>Soltero/a</option><option>Casado/a</option><option>Divorciado/a</option><option>Viudo/a</option><option>Unión convivencial</option>
@@ -164,19 +165,19 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
   </div>
   <div class="field req"><label>Correo electrónico</label><input type="email" id="p-email" placeholder="email@ejemplo.com"></div>
-  <div class="field"><label>Profesión</label><input type="text" id="p-prof" placeholder="Profesión u ocupación"></div>
+  <div class="field req"><label>Profesión</label><input type="text" id="p-prof" placeholder="Profesión u ocupación"></div>
 
   <div class="divider"></div>
   <div class="section-title">Madre / Tutora</div>
   <div class="field req"><label>Nombre y apellido</label><input type="text" id="m-nombre" placeholder="Nombre completo"></div>
   <div class="row2">
     <div class="field req"><label>DNI</label><input type="text" id="m-dni" placeholder="Sin puntos"></div>
-    <div class="field"><label>Fecha de nacimiento</label><input type="date" id="m-fnac"></div>
+    <div class="field req"><label>Fecha de nacimiento</label><input type="date" id="m-fnac"></div>
   </div>
-  <div class="field"><label>Domicilio</label><input type="text" id="m-dom" placeholder="Calle, número, localidad"></div>
+  <div class="field req"><label>Domicilio</label><input type="text" id="m-dom" placeholder="Calle, número, localidad"></div>
   <div class="row2">
     <div class="field req"><label>Teléfono</label><input type="tel" id="m-tel" placeholder="Número de contacto"></div>
-    <div class="field"><label>Estado civil</label>
+    <div class="field req"><label>Estado civil</label>
       <select id="m-ecivil">
         <option value="">Seleccioná</option>
         <option>Soltera</option><option>Casada</option><option>Divorciada</option><option>Viuda</option><option>Unión convivencial</option>
@@ -184,7 +185,7 @@ body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; b
     </div>
   </div>
   <div class="field req"><label>Correo electrónico</label><input type="email" id="m-email" placeholder="email@ejemplo.com"></div>
-  <div class="field"><label>Profesión</label><input type="text" id="m-prof" placeholder="Profesión u ocupación"></div>
+  <div class="field req"><label>Profesión</label><input type="text" id="m-prof" placeholder="Profesión u ocupación"></div>
 
   <div class="divider"></div>
   <div class="section-title">Hermanos ingresantes</div>
@@ -534,8 +535,14 @@ function enviar(){
 
   // Validación básica
   if(!d.alumno){alert('Por favor ingresá el nombre del alumno/a.');return;}
-  if(!d.p_nombre && !d.m_nombre){alert('Por favor completá los datos de al menos un padre o tutor.');return;}
-  if((d.p_nombre && !d.p_dni)||(d.m_nombre && !d.m_dni)){alert('Por favor ingresá el DNI del padre/tutor que completaste.');return;}
+
+  // Al menos un tutor debe estar completo
+  const padreCompleto = d.p_nombre && d.p_dni && d.p_fnac && d.p_dom && d.p_tel && d.p_ecivil && d.p_email && d.p_prof;
+  const madreCompleta = d.m_nombre && d.m_dni && d.m_fnac && d.m_dom && d.m_tel && d.m_ecivil && d.m_email && d.m_prof;
+
+  if(!padreCompleto && !madreCompleta){
+    alert('Por favor completá todos los campos de al menos un padre o tutor (padre/tutor o madre/tutora).');return;
+  }
 
   formData=d;
   const btn=document.getElementById('btn-enviar');
